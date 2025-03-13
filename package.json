@@ -104,6 +104,7 @@
     "@nuxt/schema": "^3.16.0",
     "@types/node": "^22.13.10",
     "bumpp": "^10.1.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.22.0",
     "nodemon": "^3.1.9",
     "rollup": "^4.35.0",
