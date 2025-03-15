@@ -2,22 +2,56 @@ import type { UnpluginFactory } from 'unplugin'
 import type { Options } from './types'
 import { createUnplugin } from 'unplugin'
 import { PLUGIN_NAME } from './constants'
+import { UNPLUGIN_NAME } from './core/constants'
+import { createContext } from './core/context'
+import { generateImageComponentPath, isImagePath, resolveImagePath } from './core/loader'
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => {
-  console.log(1231234, options)
+  const ctx = createContext(options || {})
   return {
-    name: 'unplugin-front-end-image',
-    transformInclude(id) {
-      return id.endsWith('main.ts')
+    name: UNPLUGIN_NAME,
+    
+    resolveId(id) {
+      if (isImagePath(id)) {
+        return generateImageComponentPath(id)
+      }
+      return null
     },
-    transform(code) {
-      return code.replace('__UNPLUGIN__', `Hello Unplugin! ${options}`)
+    loadInclude(id) {
+      return isImagePath(id)
+    },
+
+    load(id) {
+      if (isImagePath(id)) {
+        const { name, ext } = resolveImagePath(id, ctx.options)
+        const pic = ctx.searchImage(name, ext)
+        const image = pic?.file
+        return `
+          import img from '${image}'
+          console.log(\`${id}\`)
+          export default {
+            render(h) {
+              return h('img', {
+                attrs: { src: img, ...this.$attrs },
+                on: { ...this.$listeners }
+              })
+            }
+          }
+      `
+      }
+      return null
     },
     webpack(compiler) {
-      compiler.hooks.afterCompile.tap(PLUGIN_NAME, (compilation) => {
-
+      let watcher: any
+      compiler.hooks.beforeCompile.tapPromise(PLUGIN_NAME, async (c) => {
+        watcher = await ctx.searchImages()
       })
-    },
+      compiler.hooks.done.tap('WatchDirectoryPlugin', () => {
+        if (watcher) {
+          watcher.close();
+        }
+      });
+    }
   }
 }
 

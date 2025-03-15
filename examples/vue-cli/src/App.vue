@@ -1,20 +1,31 @@
-<template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
-</template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Logo from 'virtual_image/logo.png'
+// import SvgIcon from 'virtual_image/jpeg.svg';
+import SvgIcon from 'virtual_image/svg/jpeg.svg';
+import SvgIconaa from 'virtual_image/logo1.png';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    Logo,
+    SvgIcon,
+    SvgIconaa,
+  },
+  methods: {
+    alert() {
+      alert(1)
+    },
+  },
 }
 </script>
+
+<template>
+  <div id="app">
+    <!-- <Logo width="100px" height="53px" @click="alert" />
+    <SvgIcon width="100px" height="53px" @click="alert" /> -->
+    <SvgIconaa width="100px" height="53px" @click="alert" />
+  </div>
+</template>
 
 <style>
 #app {
